@@ -5,7 +5,7 @@ import requests
 st.set_page_config(page_title="ScoutLab Hacker", layout="wide")
 
 st.title("🌪️ ScoutLab Furacão - MODO HACKER")
-st.write("Buscando o elenco atualizado em tempo real na Wikipedia...")
+st.write("Invasão na Wikipedia em andamento...")
 
 URL = "https://pt.wikipedia.org/wiki/Club_Athletico_Paranaense"
 
@@ -17,24 +17,15 @@ def buscar_dados():
         }
         
         resposta = requests.get(URL, headers=headers)
+        
+        # O Pandas varre todo o código fonte e pega todas as tabelas
         tabelas = pd.read_html(resposta.text)
         
-        # A nova tática: varrer todas as tabelas e juntar as que parecem ser de elenco
-        tabelas_elenco = []
-        for tabela in tabelas:
-            # Transformamos todos os nomes de colunas em minúsculas para não ter erro
-            colunas_minusculas = [str(c).lower() for c in tabela.columns]
-            
-            # Se a tabela tiver a palavra 'nome' ou 'jogador', é a que queremos!
-            if 'nome' in colunas_minusculas or 'jogador' in colunas_minusculas:
-                tabelas_elenco.append(tabela)
+        # TÁTICA FORÇA BRUTA: Pega a tabela com MAIS LINHAS na página.
+        # O elenco ou histórico de jogos sempre são as maiores listas!
+        maior_tabela = max(tabelas, key=len)
         
-        if len(tabelas_elenco) > 0:
-            # Junta todas as partes da tabela (caso a Wikipedia separe goleiros de atacantes)
-            df_final = pd.concat(tabelas_elenco, ignore_index=True)
-            return df_final
-            
-        return "Tabela não encontrada. O layout mudou drasticamente."
+        return maior_tabela
     except Exception as e:
         return f"Erro ao hackear os dados: {e}"
 
@@ -43,12 +34,12 @@ df_live = buscar_dados()
 if isinstance(df_live, str):
     st.error(df_live)
 else:
-    st.success("✅ Acesso concedido! O Robô varreu a página e encontrou o elenco.")
+    st.success("✅ Firewall quebrado! Maior tabela extraída com sucesso.")
     
-    st.subheader("📋 Elenco Profissional (Tempo Real)")
+    st.subheader("📋 Dados Capturados (Direto da Wikipedia)")
     
-    # Exibe a tabela bruta que o robô conseguiu extrair
+    # Mostramos a tabela bruta para você ver o que o robô pescou
     st.dataframe(df_live, use_container_width=True)
     
     st.divider()
-    st.write("*(Dados extraídos diretamente da página do Athletico na Wikipedia)*")
+    st.write(f"**Linhas capturadas:** {len(df_live)}")
