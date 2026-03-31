@@ -1,0 +1,22 @@
+Nome,Posicao,Idade,Pe_Dominante,Jogos,Minutos_Jogados,Gols,Assistencias,xG,xA,Passes_Certos_Pct,Desarmes_Por_Jogo,Gols_Sofridos,Defesas
+Santos,Goleiro,36,Direito,8,720,0,0,0.00,0.01,58,0.0,8,22
+Leonardo Derik,Zagueiro,20,Esquerdo,5,223,0,0,0.02,0.12,86,0.4,0,0
+Gastón Benavídez,Lateral,30,Direito,8,720,0,3,0.27,0.48,81,1.0,0,0
+Carlos Terán,Zagueiro,25,Direito,6,423,0,0,0.07,0.08,82,1.2,0,0
+Arthur Dias,Zagueiro,18,Direito,8,691,0,0,0.00,0.07,83,1.0,0,0
+Juan Felipe Aguirre,Zagueiro,29,Direito,6,451,1,0,0.33,0.01,90,0.8,0,0
+Léo Pelé,Zagueiro,30,Esquerdo,1,10,0,0,0.00,0.00,100,0.0,0,0
+Lucas Esquivel,Lateral,24,Esquerdo,7,594,1,3,0.21,1.39,84,1.3,0,0
+Gilberto Junior,Volante,21,Direito,1,15,0,0,0.00,0.00,67,2.0,0,0
+Felipinho,Volante,24,Esquerdo,1,10,0,0,0.00,0.00,50,1.0,0,0
+Bruninho,Meia,17,Esquerdo,3,43,0,0,0.02,0.02,71,0.0,0,0
+Jádson,Volante,32,Direito,6,286,0,0,0.00,0.03,84,1.2,0,0
+João Cruz,Meia,19,Direito,3,47,0,0,0.12,0.25,79,0.0,0,0
+Dudu,Meia,20,Esquerdo,7,332,1,1,0.82,0.12,84,0.4,0,0
+Steven Mendoza,Atacante,33,Esquerdo,8,628,3,0,0.65,0.65,88,0.9,0,0
+Camilo Portilla,Volante,27,Direito,8,378,0,0,0.07,0.03,84,1.0,0,0
+Bruno Zapelli,Meia,23,Direito,7,387,0,1,0.49,0.47,80,0.7,0,0
+Luiz Gustavo,Volante,38,Esquerdo,7,540,1,0,0.42,0.33,91,1.3,0,0
+Renan,Atacante,26,Direito,2,2,0,0,0.00,0.00,0,0.0,0,0
+Julimar,Atacante,25,Direito,8,502,2,1,2.02,0.84,68,0.5,0,0
+Kevin Viveros,Atacante,25,Direito,8,719,5,1,5.23,0.14,80,0.4,0,0
