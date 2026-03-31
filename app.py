@@ -23,14 +23,21 @@ else:
 st.subheader(f"Mostrando dados para: {posicao}")
 st.dataframe(df_filtrado, use_container_width=True)
 
-# Seção de Gráficos (Ajustada)
-st.markdown("---")
+# SEÇÃO DE GRÁFICOS (MODERNA E HORIZONTAL)
+st.divider()
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("🎯 Quem é o Garçom? (Assistências)")
-    st.bar_chart(df.set_index("Nome")["Assistencias"])
+    st.subheader("🎯 Garçons (Assistências)")
+    # Organizamos do menor para o maior para o melhor ficar no topo do gráfico horizontal
+    assistencias = df[['Nome', 'Assistencias']].set_index('Nome').sort_values('Assistencias', ascending=True)
+    # Filtramos para mostrar apenas quem tem pelo menos 1 assistência (limpa o gráfico)
+    assistencias = assistencias[assistencias['Assistencias'] > 0]
+    st.bar_chart(assistencias, horizontal=True)
 
 with col2:
-    st.subheader("⚽ Gols por Jogador")
-    st.bar_chart(df.set_index("Nome")["Gols"])
+    st.subheader("⚽ Artilharia (Gols)")
+    gols = df[['Nome', 'Gols']].set_index('Nome').sort_values('Gols', ascending=True)
+    # Filtramos para mostrar apenas quem já marcou gol
+    gols = gols[gols['Gols'] > 0]
+    st.bar_chart(gols, horizontal=True)
