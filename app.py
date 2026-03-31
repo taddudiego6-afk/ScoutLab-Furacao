@@ -7,18 +7,24 @@ st.set_page_config(page_title="ScoutLab Real-Time", layout="wide")
 st.title("🌪️ ScoutLab Furacão - MODO HACKER (Live)")
 st.write("Buscando dados estatísticos em tempo real no FBref...")
 
-# Link da tabela de estatísticas do Athletico no FBref (Brasileirão 2025/26)
+# Link da tabela de estatísticas do Athletico
 URL = "https://fbref.com/pt/equipes/2091c36b/Athletico-Paranaense-Estatisticas"
 
-@st.cache_data(ttl=3600) # O robô "descansa" por 1 hora antes de buscar de novo
+@st.cache_data(ttl=3600)
 def buscar_dados():
     try:
-        # O Pandas tenta ler todas as tabelas da página
-        tabelas = pd.read_html(URL, flavor='lxml')
-        # A primeira tabela (índice 0) costuma ser a de estatísticas padrão
-        df = tabelas[0]
+        # --- O DISFARCE HACKER ---
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        # Baixamos a página com o disfarce
+        resposta = requests.get(URL, headers=headers)
         
-        # Limpeza básica (o FBref usa níveis múltiplos de colunas)
+        # O Pandas lê as tabelas dentro da resposta do site
+        tabelas = pd.read_html(resposta.text, flavor='lxml')
+        
+        # Pegamos a primeira tabela e limpamos os títulos duplos
+        df = tabelas[0]
         df.columns = df.columns.droplevel(0) 
         return df
     except Exception as e:
@@ -29,7 +35,7 @@ df_live = buscar_dados()
 if isinstance(df_live, str):
     st.error(df_live)
 else:
-    # Filtro de jogadores (removendo a linha de 'Total do Plantel')
+    # Limpeza para focar nos jogadores reais
     df_live = df_live[df_live['Jogador'] != 'Total do Plantel']
     
     st.subheader("📊 Estatísticas Atualizadas (via Web Scraping)")
@@ -37,6 +43,11 @@ else:
 
     # Gráfico de Gols ao Vivo
     st.divider()
+    st.subheader("⚽ Artilharia em Tempo Real")
+    df_live['Gols'] = pd.to_numeric(df_live['Gols'], errors='coerce').fillna(0)
+    # Filtramos só quem tem gol para o gráfico ficar bonito
+    gols_chart = df_live[df_live['Gols'] > 0].set_index("Jogador")["Gols"].sort_values()
+    st.bar_chart(gols_chart, horizontal=True)    st.divider()
     st.subheader("⚽ Gols na Temporada")
     # Convertendo gols para número (às vezes vem como texto no site)
     df_live['Gols'] = pd.to_numeric(df_live['Gols'], errors='coerce').fillna(0)
