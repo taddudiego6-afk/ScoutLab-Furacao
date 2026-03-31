@@ -1,43 +1,43 @@
 import streamlit as st
 import pandas as pd
+import requests
 
-# Configuração da página
-st.set_page_config(page_title="ScoutLab - Athletico", layout="wide")
+st.set_page_config(page_title="ScoutLab Real-Time", layout="wide")
 
-st.title("🌪️ Laboratório Tático - Athletico Paranaense")
-st.markdown("Bem-vindo ao banco de dados estatístico do Furacão.")
+st.title("🌪️ ScoutLab Furacão - MODO HACKER (Live)")
+st.write("Buscando dados estatísticos em tempo real no FBref...")
 
-# Carregar os dados (Seu arquivo CSV)
-df = pd.read_csv("dados_furacao.csv")
+# Link da tabela de estatísticas do Athletico no FBref (Brasileirão 2025/26)
+URL = "https://fbref.com/pt/equipes/2091c36b/Athletico-Paranaense-Estatisticas"
 
-# Filtro lateral
-st.sidebar.header("Filtros")
-posicao = st.sidebar.selectbox("Filtre por Posição:", ["Todos"] + list(df['Posicao'].unique()))
+@st.cache_data(ttl=3600) # O robô "descansa" por 1 hora antes de buscar de novo
+def buscar_dados():
+    try:
+        # O Pandas tenta ler todas as tabelas da página
+        tabelas = pd.read_html(URL, flavor='lxml')
+        # A primeira tabela (índice 0) costuma ser a de estatísticas padrão
+        df = tabelas[0]
+        
+        # Limpeza básica (o FBref usa níveis múltiplos de colunas)
+        df.columns = df.columns.droplevel(0) 
+        return df
+    except Exception as e:
+        return f"Erro ao hackear os dados: {e}"
 
-if posicao != "Todos":
-    df_filtrado = df[df['Posicao'] == posicao]
+df_live = buscar_dados()
+
+if isinstance(df_live, str):
+    st.error(df_live)
 else:
-    df_filtrado = df
+    # Filtro de jogadores (removendo a linha de 'Total do Plantel')
+    df_live = df_live[df_live['Jogador'] != 'Total do Plantel']
+    
+    st.subheader("📊 Estatísticas Atualizadas (via Web Scraping)")
+    st.dataframe(df_live, use_container_width=True)
 
-# Exibir Tabela
-st.subheader(f"Mostrando dados para: {posicao}")
-st.dataframe(df_filtrado, use_container_width=True)
-
-# SEÇÃO DE GRÁFICOS (MODERNA E HORIZONTAL)
-st.divider()
-col1, col2 = st.columns(2)
-
-with col1:
-    st.subheader("🎯 Garçons (Assistências)")
-    # Organizamos do menor para o maior para o melhor ficar no topo do gráfico horizontal
-    assistencias = df[['Nome', 'Assistencias']].set_index('Nome').sort_values('Assistencias', ascending=True)
-    # Filtramos para mostrar apenas quem tem pelo menos 1 assistência (limpa o gráfico)
-    assistencias = assistencias[assistencias['Assistencias'] > 0]
-    st.bar_chart(assistencias, horizontal=True)
-
-with col2:
-    st.subheader("⚽ Artilharia (Gols)")
-    gols = df[['Nome', 'Gols']].set_index('Nome').sort_values('Gols', ascending=True)
-    # Filtramos para mostrar apenas quem já marcou gol
-    gols = gols[gols['Gols'] > 0]
-    st.bar_chart(gols, horizontal=True)
+    # Gráfico de Gols ao Vivo
+    st.divider()
+    st.subheader("⚽ Gols na Temporada")
+    # Convertendo gols para número (às vezes vem como texto no site)
+    df_live['Gols'] = pd.to_numeric(df_live['Gols'], errors='coerce').fillna(0)
+    st.bar_chart(df_live.set_index("Jogador")["Gols"])
