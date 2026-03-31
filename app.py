@@ -1,30 +1,30 @@
 import streamlit as st
 import pandas as pd
-import requests
 
 # Configuração da página
-st.set_page_config(page_title="ScoutLab Real-Time", layout="wide")
+st.set_page_config(page_title="ScoutLab Hacker", layout="wide")
 
-st.title("🌪️ ScoutLab Furacão - MODO HACKER (Live)")
-st.write("Buscando dados estatísticos em tempo real no FBref...")
+st.title("🌪️ ScoutLab Furacão - MODO HACKER")
+st.write("Buscando o elenco atualizado em tempo real na Wikipedia...")
 
-# Link da tabela de estatísticas do Athletico
-URL = "https://fbref.com/pt/equipes/2091c36b/Athletico-Paranaense-Estatisticas"
+# Novo Alvo: Wikipedia (Não bloqueia robôs!)
+URL = "https://pt.wikipedia.org/wiki/Club_Athletico_Paranaense"
 
 @st.cache_data(ttl=3600)
 def buscar_dados():
     try:
-        # Disfarce para o site não bloquear o robô
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        resposta = requests.get(URL, headers=headers)
-        tabelas = pd.read_html(resposta.text, flavor='lxml')
+        # O Pandas consegue ler a Wikipedia facilmente
+        tabelas = pd.read_html(URL)
         
-        # Pegamos a tabela principal e limpamos os títulos duplos
-        df = tabelas[0]
-        df.columns = df.columns.droplevel(0) 
-        return df
+        # A Wikipedia tem várias tabelas na página. 
+        # Vamos procurar a que tem a coluna "Nome" e "Pos." (Posição)
+        for tabela in tabelas:
+            if 'Nome' in tabela.columns and 'Pos.' in tabela.columns:
+                # Limpando colunas inúteis se existirem
+                tabela_limpa = tabela[['N.º', 'Pos.', 'Nome', 'Nascimento']]
+                return tabela_limpa
+                
+        return "Tabela de elenco não encontrada na página."
     except Exception as e:
         return f"Erro ao hackear os dados: {e}"
 
@@ -33,22 +33,12 @@ df_live = buscar_dados()
 if isinstance(df_live, str):
     st.error(df_live)
 else:
-    # Limpeza: Remove linhas de totais e jogadores sem nome
-    df_live = df_live[df_live['Jogador'].notna()]
-    df_live = df_live[df_live['Jogador'] != 'Total do Plantel']
+    st.success("✅ Acesso concedido! Dados extraídos da Wikipedia com sucesso.")
     
-    st.subheader("📊 Estatísticas Atualizadas (via Web Scraping)")
+    st.subheader("📋 Elenco Profissional (Tempo Real)")
+    # Mostra a tabela bonitona
     st.dataframe(df_live, use_container_width=True)
-
-    # Gráfico de Gols
+    
+    # Pequeno resumo dos dados hackeados
     st.divider()
-    st.subheader("⚽ Artilharia em Tempo Real")
-    
-    # Converte gols para número e filtra quem marcou
-    df_live['Gols'] = pd.to_numeric(df_live['Gols'], errors='coerce').fillna(0)
-    gols_chart = df_live[df_live['Gols'] > 0].set_index("Jogador")["Gols"].sort_values()
-    
-    if not gols_chart.empty:
-        st.bar_chart(gols_chart, horizontal=True)
-    else:
-        st.info("Nenhum gol registrado nesta tabela ainda.")
+    st.write(f"**Total de jogadores encontrados:** {len(df_live)}")
